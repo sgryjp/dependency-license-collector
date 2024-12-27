@@ -1,2 +1,3 @@
 # license-lister
-List &amp; download license files of dependency packagies
+
+Command to download license files of dependency packages

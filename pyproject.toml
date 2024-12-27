@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=41", "wheel", "setuptools-git-versioning>=2.0,<3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "license-lister"
+version = "0.1.0"
+description = "Download license files of dependency packages"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "better-exceptions>=0.3.3",
+    "click>=8.1.8",
+    "httpx>=0.28.1",
+    "pydantic>=2.10.4",
+    "structlog>=24.4.0",
+    "tenacity>=9.0.0",
+    "typing-extensions>=4.12.2",
+]
+
+[project.scripts]
+license-lister = "license_lister.cli:main"
+
+[dependency-groups]
+dev = ["mypy>=1.14.0", "ruff>=0.8.4"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["license_lister"]

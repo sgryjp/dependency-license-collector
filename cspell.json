@@ -1,0 +1,10 @@
+{
+  "version": "0.2",
+  "ignorePaths": [".*cache/", ".venv/", "build/", "dist/"],
+  "dictionaryDefinitions": [],
+  "dictionaries": ["python"],
+  "words": [],
+  "ignoreWords": [],
+  "language": "en",
+  "import": []
+}
