@@ -5,6 +5,7 @@ from concurrent.futures import Executor
 import httpx
 import pydantic
 import structlog
+from typing_extensions import Literal
 
 from license_lister.models import Package, PackageLicense
 from license_lister.source_repositories.github import (
@@ -17,12 +18,19 @@ class _PyPIPackageInfo(pydantic.BaseModel):
     author: str | None
     classifiers: list[str] | None
     license: str | None
+    name: str
     project_urls: dict[str, str] | None
     release_url: pydantic.HttpUrl | None
+    version: str
 
 
 class PyPIPackage(pydantic.BaseModel):
     info: _PyPIPackageInfo
+
+
+class PyPIStatData(pydantic.BaseModel):
+    top_packages: dict[str, dict[Literal["size"], int]]
+    total_packages_size: int
 
 
 log = structlog.get_logger()
@@ -123,6 +131,6 @@ def _merge_package_metadata(
     return Package(
         name=package_name,
         version=package_version,
-        url=pypi_record.info.release_url,
+        release_url=pypi_record.info.release_url,
         license=package_license,
     )

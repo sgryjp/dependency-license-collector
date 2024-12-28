@@ -4,5 +4,6 @@
 build/
 dist/
 
+.cache_pypi_top100.pkl
 .env
 *.py[co]

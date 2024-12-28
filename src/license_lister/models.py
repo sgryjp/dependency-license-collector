@@ -1,7 +1,7 @@
 import pydantic
 from typing_extensions import Literal
 
-Language = Literal["python"]
+InputFormat = Literal["requirements_txt"]
 
 
 class PackageLicense(pydantic.BaseModel):
@@ -13,5 +13,5 @@ class PackageLicense(pydantic.BaseModel):
 class Package(pydantic.BaseModel):
     name: str
     version: str
-    url: pydantic.HttpUrl | None
+    release_url: pydantic.HttpUrl | None
     license: PackageLicense | None

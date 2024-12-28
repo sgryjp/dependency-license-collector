@@ -8,19 +8,20 @@ import structlog
 from typing_extensions import assert_never
 
 from license_lister.package_registries.pypi import collect_package_metadata
+from license_lister.settings import SETTINGS
 
-from .models import Language
+from .models import InputFormat
 
 log = structlog.get_logger()
 
 
 @click.command
 @click.option(
-    "-l",
-    "--language",
-    type=click.Choice(["python"], case_sensitive=False),
+    "-f",
+    "--format",
+    type=click.Choice(["requirements_txt"], case_sensitive=False),
     required=True,
-    help="Target programming language.",
+    help="Input data format.",
 )
 @click.option(
     "-o",
@@ -30,7 +31,7 @@ log = structlog.get_logger()
     help="Target programming language.",
 )
 @click.argument("f", metavar="FILENAME", type=click.File("rt"))
-def main(language: Language, outdir: Path, f: TextIO):
+def main(format: InputFormat, outdir: Path, f: TextIO):
     """Create list and download OSS license files.
 
     Use a special value "-" as FILENAME to read data from standard input.
@@ -41,11 +42,11 @@ def main(language: Language, outdir: Path, f: TextIO):
     """
     try:
         # Collect package metadata and license data
-        if language == "python":
-            with ThreadPoolExecutor() as executor:
+        if format == "requirements_txt":
+            with ThreadPoolExecutor(SETTINGS.max_workers) as executor:
                 packages = collect_package_metadata(executor, f.readlines())
         else:
-            assert_never(language)
+            assert_never(format)
 
         # Save the result
         outdir.mkdir(parents=True, exist_ok=True)

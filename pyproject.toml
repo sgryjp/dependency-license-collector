@@ -13,6 +13,7 @@ dependencies = [
     "click>=8.1.8",
     "httpx>=0.28.1",
     "pydantic>=2.10.4",
+    "pydantic-settings>=2.7.0",
     "structlog>=24.4.0",
     "tenacity>=9.0.0",
     "typing-extensions>=4.12.2",
@@ -22,7 +23,12 @@ dependencies = [
 license-lister = "license_lister.cli:main"
 
 [dependency-groups]
-dev = ["mypy>=1.14.0", "ruff>=0.8.4"]
+dev = [
+    "mypy>=1.14.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.8.4",
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["license_lister"]

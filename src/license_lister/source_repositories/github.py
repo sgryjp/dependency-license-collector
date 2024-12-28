@@ -11,6 +11,8 @@ from tenacity import (
     wait_exponential_jitter,
 )
 
+from license_lister.settings import SETTINGS
+
 log = structlog.get_logger()
 _re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)")
 
@@ -55,9 +57,18 @@ def get_license_data(repos_url: str) -> GitHubLicenseContent | None:
     if match is None:
         return None
     owner, repo = match.groups()
+
     url = f"https://api.github.com/repos/{owner}/{repo}/license"
-    resp = httpx.get(url, headers={"accept": "application/vnd.github+json"})
+    headers = _make_headers_for_github_api() | {"accept": "application/vnd.github+json"}
+    resp = httpx.get(url, headers=headers)
     if resp.status_code == 403:
         log.warning("Hit rate limit of GitHub API", url=repos_url)
         raise RateLimitError()
     return GitHubLicenseContent.model_validate(resp.json())
+
+
+def _make_headers_for_github_api() -> dict[str, str]:
+    headers = {"X-GitHub-Api-Version": "2022-11-28"}
+    if SETTINGS.github_token is not None:
+        headers["Authorization"] = f"Bearer {SETTINGS.github_token}"
+    return headers
