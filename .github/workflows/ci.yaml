@@ -1,0 +1,28 @@
+name: Test
+
+on:
+  # Run at 00:00 on Monday or manual trigger
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch: # Allows manual triggering
+  pull_request:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Run tests
+        run: uv run -- pytest --cov=license_lister --cov-report=xml

@@ -5,5 +5,7 @@ build/
 dist/
 
 .cache_pypi_top100.pkl
+.coverage
+.coverage.xml
 .env
 *.py[co]
