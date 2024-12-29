@@ -3,7 +3,7 @@
   "ignorePaths": [".*cache/", ".venv/", "build/", "dist/"],
   "dictionaryDefinitions": [],
   "dictionaries": ["python"],
-  "words": [],
+  "words": ["Suguru", "Yamamoto"],
   "ignoreWords": [],
   "language": "en",
   "import": []
