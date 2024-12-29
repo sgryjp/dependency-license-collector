@@ -1,6 +1,9 @@
 from concurrent.futures import Executor
 
-from license_lister.package_registries.pypi import PyPIPackage, collect_package_metadata
+from dep_license_collector.package_registries.pypi import (
+    PyPIPackage,
+    collect_package_metadata,
+)
 
 
 def test_can_get_pypi_top100(executor: Executor, pypi_top100: list[PyPIPackage]):

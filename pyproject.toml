@@ -3,9 +3,9 @@ requires = ["setuptools>=41", "wheel", "setuptools-git-versioning>=2.0,<3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "license-lister"
+name = "dep-license-collector"
 version = "0.1.0"
-description = "Download license files of dependency packages"
+description = "Collect license data of dependency packages"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -20,10 +20,10 @@ dependencies = [
 ]
 
 [project.scripts]
-license-lister = "license_lister.cli:main"
+license-lister = "dep_license_collector.cli:main"
 
 [dependency-groups]
 dev = ["mypy>=1.14.0", "pytest>=8.3.4", "pytest-cov>=6.0.0", "ruff>=0.8.4"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["license_lister"]
+known-first-party = ["dep_license_collector"]

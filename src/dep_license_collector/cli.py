@@ -7,8 +7,8 @@ import click
 import structlog
 from typing_extensions import assert_never
 
-from license_lister.package_registries.pypi import collect_package_metadata
-from license_lister.settings import SETTINGS
+from dep_license_collector.package_registries.pypi import collect_package_metadata
+from dep_license_collector.settings import SETTINGS
 
 from .models import InputFormat
 

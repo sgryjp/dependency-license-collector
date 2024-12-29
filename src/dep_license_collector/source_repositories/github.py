@@ -11,7 +11,7 @@ from tenacity import (
     wait_exponential_jitter,
 )
 
-from license_lister.settings import SETTINGS
+from dep_license_collector.settings import SETTINGS
 
 log = structlog.get_logger()
 _re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)")

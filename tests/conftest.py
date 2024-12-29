@@ -8,8 +8,8 @@ import httpx
 import pytest
 import structlog
 
-from license_lister.package_registries.pypi import PyPIPackage, PyPIStatData
-from license_lister.settings import SETTINGS
+from dep_license_collector.package_registries.pypi import PyPIPackage, PyPIStatData
+from dep_license_collector.settings import SETTINGS
 
 log = structlog.get_logger()
 _workspace_path = Path(__file__).parents[1]

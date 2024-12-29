@@ -7,8 +7,8 @@ import pydantic
 import structlog
 from typing_extensions import Literal
 
-from license_lister.models import Package, PackageLicense
-from license_lister.source_repositories.github import (
+from dep_license_collector.models import Package, PackageLicense
+from dep_license_collector.source_repositories.github import (
     GitHubLicenseContent,
     get_license_data,
 )
