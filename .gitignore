@@ -1,3 +1,4 @@
+__pycache__/
 .*cache/
 .venv/
 *.egg-info/
@@ -6,6 +7,6 @@ dist/
 
 .cache_pypi_top100.pkl
 .coverage
-.coverage.xml
 .env
 *.py[co]
+coverage.xml

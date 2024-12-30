@@ -3,27 +3,61 @@ requires = ["setuptools>=41", "wheel", "setuptools-git-versioning>=2.0,<3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dep-license-collector"
+name = "dependency-license-collector"
 version = "0.1.0"
 description = "Collect license data of dependency packages"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
-    "better-exceptions>=0.3.3",
     "click>=8.1.8",
     "httpx>=0.28.1",
     "pydantic>=2.10.4",
     "pydantic-settings>=2.7.0",
-    "structlog>=24.4.0",
+    "rich>=13.9.4",
     "tenacity>=9.0.0",
     "typing-extensions>=4.12.2",
 ]
 
 [project.scripts]
-license-lister = "dep_license_collector.cli:main"
+dlc = "dlc.cli:main"
 
 [dependency-groups]
 dev = ["mypy>=1.14.0", "pytest>=8.3.4", "pytest-cov>=6.0.0", "ruff>=0.8.4"]
 
+[tool.mypy]
+sqlite_cache = true
+
+[tool.ruff.lint]
+extend-select = [
+    "A",
+    "ANN",
+    "FBT",
+    "ERA",
+    "INP",
+    "N",
+    "S",
+    "PT",
+    "PLR",
+    "EM",
+    "T20",
+]
+ignore = [
+    "ANN002",  # Missing type annotation for `*args`
+    "EM101",   # Exception must not use a string literal, assign to variable first
+    "S101",    # Use of `assert` detected
+    "PLR2004", # Magic value used in comparison, consider replacing `200` with a constant variable
+]
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = ["callMethod"]
+
+[tool.ruff.lint.per-file-ignores]
+"conftest.py" = ["D", "INP001"]
+"test_*.py" = ["ANN", "D"]
+
 [tool.ruff.lint.isort]
-known-first-party = ["dep_license_collector"]
+known-first-party = ["dlc"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --cov=dlc --cov-report=term-missing"

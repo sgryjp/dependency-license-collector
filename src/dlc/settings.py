@@ -1,10 +1,15 @@
+"""Application settings."""
+
+from typing import Optional
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    better_exceptions: int = 0
-    github_token: str | None = None
-    max_workers: int | None = None
+    """Application settings."""
+
+    github_token: Optional[str] = None
+    max_workers: Optional[int] = None
 
     model_config = SettingsConfigDict(env_file=".env")
 

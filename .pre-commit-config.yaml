@@ -25,3 +25,10 @@ repos:
         language: system
         entry: uv run -- ruff format
         files: ^.*\.py$
+
+      - id: mypy
+        name: mypy
+        language: system
+        entry: uv run -- mypy -p dlc
+        pass_filenames: false
+        files: ^.*\.py$

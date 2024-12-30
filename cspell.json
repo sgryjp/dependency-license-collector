@@ -1,6 +1,6 @@
 {
   "version": "0.2",
-  "ignorePaths": [".*cache/", ".venv/", "build/", "dist/"],
+  "ignorePaths": [".*cache/", ".venv/", "*.toml", "build/", "dist/"],
   "dictionaryDefinitions": [],
   "dictionaries": ["python"],
   "words": ["Suguru", "Yamamoto"],
