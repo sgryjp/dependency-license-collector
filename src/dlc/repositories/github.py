@@ -18,7 +18,7 @@ from dlc.models.github import TaggedGitHubLicenseContent
 from dlc.settings import SETTINGS
 
 _logger = logging.getLogger(__name__)
-_re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)(?:\.git)?")
+_re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)")
 
 
 @retry(
@@ -35,7 +35,8 @@ def get_license_data_from_github(
             "Specified repository URL is not of GitHub. repos_url=%s", repos_url
         )
         return None
-    owner, repo = match.groups()
+    owner = match.group(1)
+    repo = re.sub(r"\.git$", "", match.group(2))
 
     url = f"https://api.github.com/repos/{owner}/{repo}/license"
     headers = _make_headers_for_github_api() | {"accept": "application/vnd.github+json"}
