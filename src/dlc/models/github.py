@@ -17,6 +17,7 @@ class GitHubLicenseSimple(BaseModel):
 
 # https://docs.github.com/ja/rest/licenses/licenses?apiVersion=2022-11-28#get-the-license-for-a-repository
 class GitHubLicenseContent(BaseModel):
+    _tag: Literal["github"] = "github"
     name: str
     size: int
     url: AnyUrl
@@ -30,7 +31,3 @@ class GitHubLicenseContent(BaseModel):
             return b64decode(self.content)
         _logger.warning("Unsupported encoding: %s", self.encoding)
         return None
-
-
-class TaggedGitHubLicenseContent(GitHubLicenseContent):
-    _tag: Literal["github"] = "github"

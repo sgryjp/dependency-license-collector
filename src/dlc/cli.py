@@ -5,6 +5,7 @@ import logging
 import logging.config
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import TextIO
 
@@ -75,11 +76,11 @@ def main(
             _logger.info("Wrote %s.", license_jsonl_path)
         if n_packages > 0:
             for i, package in enumerate(packages):
-                if package.license is not None and package.license.content is not None:
+                if (license_file := package.license_file) is not None:
                     license_file_path = outdir.joinpath(package.name).with_suffix(
                         ".txt",
                     )
-                    license_file_path.write_bytes(package.license.content)
+                    license_file_path.write_bytes(license_file)
                     _logger.debug("(%3d) Wrote %s.", i, license_file_path)
                 else:
                     _logger.debug("Skip %s %s", package.name, package.version)
@@ -90,6 +91,14 @@ def main(
 
 def _setup_logging(verbosity: int) -> None:
     level = {-1: logging.WARNING, 1: logging.DEBUG}.get(verbosity, logging.INFO)
+    file_formatter = logging.Formatter(
+        "%(asctime)s %(levelname)-7s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    )
+    file_formatter.default_msec_format = "%s.%03d"
+    file_handler = RotatingFileHandler(
+        filename="dlc.log", maxBytes=1024 * 1024, backupCount=1
+    )
+    file_handler.setFormatter(file_formatter)
     logging.basicConfig(
         format="%(message)s",
         handlers=[
@@ -101,6 +110,7 @@ def _setup_logging(verbosity: int) -> None:
                     dt.strftime("%Y-%m-%d %H:%M:%S.%f"),
                 ),
             ),
+            file_handler,
         ],
     )
     logging.getLogger(__name__.split(".")[0]).setLevel(level)

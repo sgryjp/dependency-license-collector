@@ -3,7 +3,7 @@
   "ignorePaths": [".*cache/", ".venv/", "*.toml", "build/", "dist/"],
   "dictionaryDefinitions": [],
   "dictionaries": ["python"],
-  "words": ["Suguru", "Yamamoto"],
+  "words": ["levelname", "libdeeplake", "Suguru", "Yamamoto"],
   "ignoreWords": [],
   "language": "en",
   "import": []

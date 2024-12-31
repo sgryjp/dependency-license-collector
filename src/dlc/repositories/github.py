@@ -14,7 +14,7 @@ from dlc.exceptions import (
     ApiRateLimitError,
     LicenseDataUnavailableError,
 )
-from dlc.models.github import TaggedGitHubLicenseContent
+from dlc.models.github import GitHubLicenseContent
 from dlc.settings import SETTINGS
 
 _logger = logging.getLogger(__name__)
@@ -22,19 +22,16 @@ _re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)")
 
 
 @retry(
-    retry=retry_if_exception_type(),
+    retry=retry_if_exception_type(ApiRateLimitError),
     wait=wait_exponential_jitter(4, max=64),
     stop=stop_after_attempt(3),
 )
 def get_license_data_from_github(
     repos_url: str,
-) -> Optional[TaggedGitHubLicenseContent]:
+) -> Optional[GitHubLicenseContent]:
     match = _re_github_url.match(repos_url)
     if match is None:
-        _logger.warning(
-            "Specified repository URL is not of GitHub. repos_url=%s", repos_url
-        )
-        return None
+        return None  # Not GitHub
     owner = match.group(1)
     repo = re.sub(r"\.git$", "", match.group(2))
 
@@ -52,8 +49,8 @@ def get_license_data_from_github(
             repo,
             repos_url,
         )
-        raise LicenseDataUnavailableError("GitHub", f"{owner}/{repo}")
-    return TaggedGitHubLicenseContent.model_validate(resp.json())
+        raise LicenseDataUnavailableError(repos_url)
+    return GitHubLicenseContent.model_validate(resp.json())
 
 
 def _make_headers_for_github_api() -> dict[str, str]:

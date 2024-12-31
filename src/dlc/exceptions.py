@@ -21,6 +21,6 @@ class PackageNotFoundError(DependencyLicenseCollectorError):
 class LicenseDataUnavailableError(DependencyLicenseCollectorError):
     """Raised when license data was not available."""
 
-    def __init__(self, location: str, name: str) -> None:
-        msg = f"License data for {name} not available in {location}"
+    def __init__(self, hint: str) -> None:
+        msg = f"License data not available: {hint}"
         super().__init__(msg)

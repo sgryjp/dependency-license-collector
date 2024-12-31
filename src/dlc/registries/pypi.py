@@ -7,7 +7,7 @@ from typing import Optional
 
 import httpx
 
-from dlc.models.common import Package, PackageLicense
+from dlc.models.common import Package
 from dlc.models.github import GitHubLicenseContent
 from dlc.models.pypi import PyPIPackage
 from dlc.repositories.github import (
@@ -69,12 +69,21 @@ def collect_package_metadata(
     # Get license information from source repository
     _logger.info("Fetching license information from source repository.")
     t0 = monotonic()
-    license_contents = list(executor.map(_get_license_file, repos_urls.values()))
+    license_contents = list(
+        executor.map(
+            lambda x: _get_license_file(x[0][0], x[0][1], x[1]), repos_urls.items()
+        )
+    )
     elapsed_seconds = monotonic() - t0
     _logger.info("Fetched in %.3g seconds.", elapsed_seconds)
 
     return [
-        _merge_package_metadata(name, version, pypi_record, license_content)
+        Package(
+            name=name,
+            version=version,
+            package_data=pypi_record,
+            raw_license_data=license_content,
+        )
         for ((name, version), pypi_record), license_content in zip(
             pypi_records.items(),
             license_contents,
@@ -100,39 +109,20 @@ def _get_pypi_package_data(name: str, version: str) -> tuple[str, str, httpx.Res
     return name, version, httpx.get(url)
 
 
-def _get_license_file(repos_url: Optional[str]) -> Optional[GitHubLicenseContent]:
+def _get_license_file(
+    name: str, version: str, repos_url: Optional[str]
+) -> Optional[GitHubLicenseContent]:
     if repos_url is None:
         return None
 
     if (license_content := get_license_data_from_github(repos_url)) is not None:
         return license_content
-    return None
 
-
-def _merge_package_metadata(
-    package_name: str,
-    package_version: str,
-    pypi_record: PyPIPackage,
-    license_content: Optional[GitHubLicenseContent],
-) -> Package:
-    if license_content is not None:
-        package_license = PackageLicense(
-            name=license_content.license.name,
-            spdx_id=license_content.license.spdx_id,
-            content=license_content.decode_content(),
-        )
-    elif pypi_record.info.license is not None and len(pypi_record.info.license) < 36:
-        package_license = PackageLicense(
-            name=pypi_record.info.license,
-            spdx_id=None,
-            content=None,
-        )
-    else:
-        package_license = None
-
-    return Package(
-        name=package_name,
-        version=package_version,
-        release_url=pypi_record.info.release_url,
-        license=package_license,
+    _logger.warning(
+        "Unsupported source repository. package=%s, version=%s, repos_url=%s",
+        name,
+        version,
+        repos_url,
     )
+
+    return None
