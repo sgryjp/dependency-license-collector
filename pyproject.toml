@@ -60,4 +60,4 @@ known-first-party = ["dlc"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-ra --cov=dlc --cov-report=term-missing"
+addopts = "-ra --cov=dlc --cov-report=term-missing --log-format='%(levelname)-8s %(name)-32s %(message)s' --log-level=INFO --tb=short"
