@@ -1,5 +1,6 @@
 """Command line interface."""
 
+import concurrent
 import logging
 import logging.config
 import sys
@@ -8,6 +9,7 @@ from pathlib import Path
 from typing import TextIO
 
 import click
+import pydantic
 import rich.text
 from rich.logging import RichHandler
 from typing_extensions import assert_never
@@ -94,7 +96,7 @@ def _setup_logging(verbosity: int) -> None:
             RichHandler(
                 omit_repeated_times=False,
                 show_path=False,
-                tracebacks_suppress=["concurrent.*", "click", logging],
+                tracebacks_suppress=[concurrent, click, logging, pydantic],
                 log_time_format=lambda dt: rich.text.Text(
                     dt.strftime("%Y-%m-%d %H:%M:%S.%f"),
                 ),
