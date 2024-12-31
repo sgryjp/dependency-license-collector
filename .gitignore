@@ -5,7 +5,7 @@ __pycache__/
 build/
 dist/
 
-.cache_pypi_top100.pkl
+.cache*
 .coverage
 .env
 *.py[co]

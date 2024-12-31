@@ -1,7 +1,6 @@
 """Test configuration."""
 
 import logging
-import pickle
 import time
 from collections.abc import Iterator
 from concurrent.futures import Executor, ThreadPoolExecutor
@@ -15,7 +14,7 @@ from dlc.settings import SETTINGS
 
 _logger = logging.getLogger()
 _workspace_path = Path(__file__).parents[1]
-_cache_path = _workspace_path.joinpath(".cache_pypi_top100.pkl")
+_cache_path = _workspace_path.joinpath(".cache_pypi_top100.jsonl")
 _cache_expiry = 24 * 3600  # 1 day
 
 
@@ -32,7 +31,10 @@ def pypi_top100(executor: Executor) -> Iterator[list[PyPIPackage]]:
         or time.time() - _cache_expiry > _cache_path.stat().st_ctime
     )
     if not expired:
-        yield pickle.loads(_cache_path.read_bytes())  # noqa: S301
+        yield [
+            PyPIPackage.model_validate_json(s)
+            for s in _cache_path.read_text().splitlines()
+        ]
     else:
         _cache_path.unlink(missing_ok=True)
 
@@ -55,6 +57,6 @@ def pypi_top100(executor: Executor) -> Iterator[list[PyPIPackage]]:
             if response.status_code != 200:
                 _logger.warning("Failed to get PyPI package data for %s.", package_name)
             package_data.append(PyPIPackage.model_validate(response.json()))
-        _cache_path.write_bytes(pickle.dumps(package_data, 5))
+        _cache_path.write_text("\n".join([p.model_dump_json() for p in package_data]))
 
         yield package_data
