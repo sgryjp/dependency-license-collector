@@ -28,7 +28,7 @@ def executor() -> Iterator[Executor]:
 def pypi_top100(executor: Executor) -> Iterator[list[PyPIPackage]]:
     expired = (
         not _cache_path.exists()
-        or time.time() - _cache_expiry > _cache_path.stat().st_ctime
+        or time.time() - _cache_expiry > _cache_path.stat().st_mtime
     )
     if not expired:
         yield [
@@ -36,8 +36,6 @@ def pypi_top100(executor: Executor) -> Iterator[list[PyPIPackage]]:
             for s in _cache_path.read_text().splitlines()
         ]
     else:
-        _cache_path.unlink(missing_ok=True)
-
         # https://docs.pypi.org/api/stats/#project-stats
         headers = {}
         headers["Accept"] = "application/json"
