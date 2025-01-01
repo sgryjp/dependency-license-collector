@@ -19,12 +19,33 @@ class PyPIPackageInfo(BaseModel):
     """
 
     author: Optional[str]
+    author_email: Optional[str]
+    bugtrack_url: Optional[str]
     classifiers: Optional[list[str]]
+    description: Optional[str]
+    description_content_type: Optional[str]
+    docs_url: Optional[str]
+    download_url: Optional[str]
+    downloads: dict[Literal["last_day", "last_month", "last_week"], int]
+    dynamic: Optional[list[str]]
+    home_page: Optional[str]
+    keywords: Optional[str]
     license: Optional[str]
+    maintainer: Optional[str]
+    maintainer_email: Optional[str]
     name: str
-    project_urls: Optional[dict[str, str]]
+    package_url: Optional[HttpUrl]
+    platform: Optional[str]
+    project_url: Optional[HttpUrl]
+    project_urls: Optional[dict[str, HttpUrl]]
+    provides_extra: Optional[list[str]]
     release_url: Optional[HttpUrl]
+    requires_dist: Optional[list[str]]
+    requires_python: Optional[str]
+    summary: Optional[str]
     version: str
+    yanked: Optional[bool]
+    yanked_reason: Optional[str]
 
 
 class PyPIPackage(BaseModel):

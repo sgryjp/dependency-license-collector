@@ -11,7 +11,7 @@ from typing import TextIO
 
 import click
 import pydantic
-import rich.text
+import tenacity
 from rich.logging import RichHandler
 from typing_extensions import assert_never
 
@@ -105,10 +105,8 @@ def _setup_logging(verbosity: int) -> None:
             RichHandler(
                 omit_repeated_times=False,
                 show_path=False,
-                tracebacks_suppress=[concurrent, click, logging, pydantic],
-                log_time_format=lambda dt: rich.text.Text(
-                    dt.strftime("%Y-%m-%d %H:%M:%S.%f"),
-                ),
+                rich_tracebacks=True,
+                tracebacks_suppress=[click, concurrent, logging, pydantic, tenacity],
             ),
             file_handler,
         ],

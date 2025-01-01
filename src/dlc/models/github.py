@@ -31,3 +31,19 @@ class GitHubLicenseContent(BaseModel):
             return b64decode(self.content)
         _logger.warning("Unsupported encoding: %s", self.encoding)
         return None
+
+
+class GitHubTreeItem(BaseModel):
+    path: Optional[str] = None
+    mode: Optional[str] = None
+    type: Optional[str] = None
+    sha: Optional[str] = None
+    size: Optional[int] = None
+    url: Optional[str] = None
+
+
+class GitHubGitTree(BaseModel):
+    sha: str
+    url: AnyUrl
+    truncated: bool
+    tree: list[GitHubTreeItem]

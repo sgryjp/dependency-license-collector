@@ -8,5 +8,6 @@ dist/
 .cache*
 .coverage
 .env
+*.log*
 *.py[co]
 coverage.xml

@@ -1,6 +1,7 @@
 import logging
 import re
-from typing import Optional
+from collections.abc import Sequence
+from typing import Optional, Union
 
 import httpx
 from tenacity import (
@@ -14,7 +15,7 @@ from dlc.exceptions import (
     ApiRateLimitError,
     LicenseDataUnavailableError,
 )
-from dlc.models.github import GitHubLicenseContent
+from dlc.models.github import GitHubGitTree, GitHubLicenseContent
 from dlc.settings import SETTINGS
 
 _logger = logging.getLogger(__name__)
@@ -29,11 +30,9 @@ _re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)")
 def get_license_data_from_github(
     repos_url: str,
 ) -> Optional[GitHubLicenseContent]:
-    match = _re_github_url.match(repos_url)
-    if match is None:
+    owner, repo = _get_owner_and_repo_from_url(repos_url)
+    if owner is None or repo is None:
         return None  # Not GitHub
-    owner = match.group(1)
-    repo = re.sub(r"\.git$", "", match.group(2))
 
     url = f"https://api.github.com/repos/{owner}/{repo}/license"
     headers = _make_headers_for_github_api() | {"accept": "application/vnd.github+json"}
@@ -42,15 +41,55 @@ def get_license_data_from_github(
     if resp.status_code == 403:
         _logger.warning("Hit rate limit of GitHub API. repos_url=%s", repos_url)
         raise ApiRateLimitError()
-    if resp.status_code != 200:
+    elif resp.status_code != 200:
         _logger.warning(
-            "Failed to fetch license data of `%s/%s`. repos_url=%s",
+            "Failed to fetch license data of `%s/%s`. status_code=%d repos_url=%s",
             owner,
             repo,
+            resp.status_code,
             repos_url,
         )
-        raise LicenseDataUnavailableError(repos_url)
+        raise LicenseDataUnavailableError(resp.status_code, repos_url)
     return GitHubLicenseContent.model_validate(resp.json())
+
+
+def get_file_list_from_github(
+    repos_url: str, sha_list: Sequence[str] = ("main", "master")
+) -> Optional[GitHubGitTree]:
+    owner, repo = _get_owner_and_repo_from_url(repos_url)
+    if owner is None or repo is None:
+        return None  # Not GitHub
+
+    for tree_sha in sha_list:
+        url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{tree_sha}"
+        headers = _make_headers_for_github_api() | {
+            "accept": "application/vnd.github+json",
+        }
+        _logger.debug("Fetching %s", url)
+        resp = httpx.get(url, params={"recursive": "true"}, headers=headers)
+        if resp.status_code == 404:
+            continue
+        elif resp.status_code == 403:
+            _logger.warning("Hit rate limit of GitHub API. repos_url=%s", repos_url)
+            raise ApiRateLimitError()
+        elif resp.status_code != 200:
+            raise NotImplementedError()  # TODO: Implement
+
+        return GitHubGitTree.model_validate(resp.json())
+
+    raise NotImplementedError()  # TODO: Implement
+
+
+def _get_owner_and_repo_from_url(
+    repos_url: str,
+) -> Union[tuple[str, str], tuple[None, None]]:
+    match = _re_github_url.match(repos_url)
+    if match is None:
+        return None, None  # Not GitHub
+    owner = match.group(1)
+    repo = re.sub(r"\.git$", "", match.group(2))
+
+    return owner, repo
 
 
 def _make_headers_for_github_api() -> dict[str, str]:

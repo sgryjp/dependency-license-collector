@@ -2,15 +2,18 @@
 
 import logging
 from concurrent.futures import Executor
+from pathlib import Path
 from time import monotonic
 from typing import Optional
 
 import httpx
 
+from dlc.exceptions import LicenseDataUnavailableError
 from dlc.models.common import Package
 from dlc.models.github import GitHubLicenseContent
 from dlc.models.pypi import PyPIPackage
 from dlc.repositories.github import (
+    get_file_list_from_github,
     get_license_data_from_github,
 )
 
@@ -71,7 +74,7 @@ def collect_package_metadata(
     t0 = monotonic()
     license_contents = list(
         executor.map(
-            lambda x: _get_license_file(x[0][0], x[0][1], x[1]), repos_urls.items()
+            lambda x: _get_license_info(x[0][0], x[0][1], x[1]), repos_urls.items()
         )
     )
     elapsed_seconds = monotonic() - t0
@@ -97,8 +100,11 @@ def _guess_repository_url(package_data: PyPIPackage) -> Optional[str]:
 
     for key in ("github", "repository", "source", "homepage"):
         for k, v in package_data.info.project_urls.items():
-            if k.lower().startswith(key):
-                return v
+            if (
+                k.lower().startswith(key)
+                and "github" in str(v).lower()  # TODO: Support GitLab etc.
+            ):
+                return str(v)
 
     return None
 
@@ -109,14 +115,33 @@ def _get_pypi_package_data(name: str, version: str) -> tuple[str, str, httpx.Res
     return name, version, httpx.get(url)
 
 
-def _get_license_file(
+def _get_license_info(
     name: str, version: str, repos_url: Optional[str]
 ) -> Optional[GitHubLicenseContent]:
     if repos_url is None:
         return None
 
-    if (license_content := get_license_data_from_github(repos_url)) is not None:
-        return license_content
+    # Try getting license data from GitHub
+    try:
+        if (license_content := get_license_data_from_github(repos_url)) is not None:
+            return license_content
+    except LicenseDataUnavailableError:
+        _logger.warning("License data not found. package=%s version=%s", name, version)
+
+    # Try searching for a license file in its source tree
+    tree_data = get_file_list_from_github(repos_url)
+    if tree_data is not None:
+        scored_file_paths = sorted(
+            [
+                (score, item.path, item.url)
+                for item in tree_data.tree
+                if item.path is not None and item.type == "blob"
+                if (score := _license_file_likelihood(item.path)) >= 0
+            ]
+        )
+        if len(scored_file_paths) > 0:
+            _, _, url = scored_file_paths[0]
+            # TODO: Fetch the URL and parse response in form {sha, node_id, size, url, content, encoding}
 
     _logger.warning(
         "Unsupported source repository. package=%s, version=%s, repos_url=%s",
@@ -126,3 +151,23 @@ def _get_license_file(
     )
 
     return None
+
+
+def _license_file_likelihood(name: str) -> int:
+    license_filenames = [
+        "LICENSE",
+        "LICENSE.md",
+        "LICENSE.txt",
+        "LICENSE.rst",
+        "COPYING",
+        "COPYING.md",
+        "COPYING.txt",
+        "COPYING.rst",
+    ]
+
+    path = Path(name)
+
+    for i, s in enumerate(license_filenames):
+        if s.lower() == path.name.lower():
+            return (i + 1) + len(path.parts) * 1000
+    return -1
