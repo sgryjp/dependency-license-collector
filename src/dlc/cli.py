@@ -16,6 +16,7 @@ from click_help_colors import HelpColorsCommand
 from rich.logging import RichHandler
 from typing_extensions import assert_never
 
+from dlc import reports
 from dlc.registries.pypi import collect_package_metadata
 from dlc.settings import SETTINGS
 
@@ -75,20 +76,8 @@ def main(
 
         # Save the result
         outdir.mkdir(parents=True, exist_ok=True)
-        license_jsonl_path = outdir.joinpath("license.jsonl")
-        with license_jsonl_path.open("wt", encoding="utf-8") as f:
-            f.writelines([pkg.model_dump_json() + "\n" for pkg in packages])
-            _logger.info("Wrote %s.", license_jsonl_path)
-        if n_packages > 0:
-            for i, package in enumerate(packages):
-                if (license_file := package.license_file) is not None:
-                    license_file_path = outdir.joinpath(package.name).with_suffix(
-                        ".txt",
-                    )
-                    license_file_path.write_bytes(license_file)
-                    _logger.debug("(%3d) Wrote %s.", i, license_file_path)
-                else:
-                    _logger.debug("Skip %s %s", package.name, package.version)
+        reports.jsonlines.generate(outdir, packages)
+        reports.license_files.generate(outdir, packages)
     except Exception:
         _logger.exception("Unexpected error")
         sys.exit(1)
