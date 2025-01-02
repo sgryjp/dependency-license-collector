@@ -5,6 +5,7 @@ import logging
 import logging.config
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import TextIO
@@ -64,6 +65,8 @@ def main(
     Example command is: `pip freeze | dlc -l python`.
     """
     _setup_logging(int(verbose) - int(quiet))
+
+    start_time = datetime.now(tz=timezone.utc)
     try:
         # Collect package metadata and license data
         if format == "requirements_txt":
@@ -75,9 +78,10 @@ def main(
         _logger.info("Collected license data of %d packages.", n_packages)
 
         # Save the result
-        outdir.mkdir(parents=True, exist_ok=True)
+        outdir.joinpath("raw").mkdir(parents=True, exist_ok=True)
         reports.jsonlines.generate(outdir, packages)
-        reports.license_files.generate(outdir, packages)
+        reports.license_files.generate(outdir.joinpath("raw"), packages)
+        reports.html.generate(outdir, start_time, packages)
     except Exception:
         _logger.exception("Unexpected error")
         sys.exit(1)

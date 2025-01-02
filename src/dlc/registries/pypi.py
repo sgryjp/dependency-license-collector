@@ -98,7 +98,7 @@ def _guess_repository_url(package_data: PyPIPackage) -> Optional[str]:
     if package_data.info.project_urls is None:
         return None
 
-    for key in ("github", "repository", "source", "homepage"):
+    for key in ("github", "repository", "source", "homepage", "download"):
         for k, v in package_data.info.project_urls.items():
             if (
                 k.lower().startswith(key)
@@ -127,21 +127,29 @@ def _get_license_info(
             return license_content
     except LicenseDataUnavailableError:
         _logger.warning("License data not found. package=%s version=%s", name, version)
-
-    # Try searching for a license file in its source tree
-    tree_data = get_file_list_from_github(repos_url)
-    if tree_data is not None:
-        scored_file_paths = sorted(
-            [
-                (score, item.path, item.url)
-                for item in tree_data.tree
-                if item.path is not None and item.type == "blob"
-                if (score := _license_file_likelihood(item.path)) >= 0
-            ]
-        )
-        if len(scored_file_paths) > 0:
-            _, _, url = scored_file_paths[0]
-            # TODO: Fetch the URL and parse response in form {sha, node_id, size, url, content, encoding}
+        try:
+            # Try searching for a license file in its source tree
+            tree_data = get_file_list_from_github(repos_url)
+            if tree_data is not None:
+                scored_file_paths = sorted(
+                    [
+                        (score, item.path, item.url)
+                        for item in tree_data.tree
+                        if item.path is not None and item.type == "blob"
+                        if (score := _license_file_likelihood(item.path)) >= 0
+                    ]
+                )
+                if len(scored_file_paths) > 0:
+                    _, _, url = scored_file_paths[0]
+                    # TODO: Fetch the URL and parse response in form {sha, node_id, size, url, content, encoding}
+                    _logger.critical("### url=%s", url)
+        except Exception:
+            _logger.warning(
+                "Failed to get file list. package=%s version=%s repos_url=%s",
+                name,
+                version,
+                repos_url,
+            )
 
     _logger.warning(
         "Unsupported source repository. package=%s, version=%s, repos_url=%s",

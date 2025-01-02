@@ -19,4 +19,4 @@ def generate(outdir: Path, packages: list[Package]) -> None:
             license_file_path.write_bytes(license_file)
             _logger.debug("(%3d) Wrote %s.", i, license_file_path)
         else:
-            _logger.debug("Skip %s %s", package.name, package.version)
+            _logger.debug("(%3d) Skip %s %s", i, package.name, package.version)

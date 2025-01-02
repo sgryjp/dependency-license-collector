@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report by Dependency License Collector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Emoji&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      .license-table {
+        border-collapse: collapse;
+      }
+
+      .license-table th,
+      .license-table td {
+        border: 1px solid gray;
+      }
+
+      .license-table td:last-child {
+        text-align: center;
+      }
+
+      .emoji {
+        font-family: "Noto Emoji";
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Report by Dependency License Collector</h1>
+    <ul>
+      <li>Execution Time: {{ start_time }}</li>
+      <li>Number of Packages Processed: {{ packages | length }}</li>
+    </ul>
+    <table class="license-table">
+      <tr>
+        <th>Name</th>
+        <th>Version</th>
+        <th>License Name</th>
+        <th>License File</th>
+        <th>Links</th>
+      </tr>
+      {% for package in packages %}
+      <tr>
+        <td>{{ package.name }}</td>
+        <td>{{ package.version }}</td>
+        <td>{{ package.license_name or "N/A" }}</td>
+        <td>
+          {% if not package.license_name is none %}
+          <a href="raw/{{ package.name }}.txt">{{ package.name }}.txt</a>
+          {% else %} N/A {% endif %}
+        </td>
+        <td>
+          {% if package.package_data.info.home_page %}
+          <a
+            class="emoji"
+            title="Home Page"
+            href="{{ package.package_data.info.home_page }}"
+            >🏠</a
+          >
+          {% endif %} {% if package.package_data.info.project_url %}
+          <a
+            class="emoji"
+            title="Package Registry"
+            href="{{ package.package_data.info.project_url }}"
+            >📦</a
+          >
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

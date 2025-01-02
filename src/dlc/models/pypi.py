@@ -36,7 +36,7 @@ class PyPIPackageInfo(BaseModel):
     name: str
     package_url: Optional[HttpUrl]
     platform: Optional[str]
-    project_url: Optional[HttpUrl]
+    project_url: Optional[HttpUrl]  # URL of PyPI Project
     project_urls: Optional[dict[str, HttpUrl]]
     provides_extra: Optional[list[str]]
     release_url: Optional[HttpUrl]

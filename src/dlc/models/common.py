@@ -22,7 +22,10 @@ class Package(BaseModel):
             return None
 
         if self.raw_license_data._tag == "github":
-            return self.raw_license_data.name
+            name = self.raw_license_data.license.spdx_id
+            if name is None or name == "NOASSERTION":
+                name = self.raw_license_data.license.name
+            return name
         else:
             assert_never(self.raw_license_data._tag)
             raise AssertionError()

@@ -73,6 +73,11 @@ def get_file_list_from_github(
             _logger.warning("Hit rate limit of GitHub API. repos_url=%s", repos_url)
             raise ApiRateLimitError()
         elif resp.status_code != 200:
+            _logger.warning(
+                "Failed to get file list from GitHub. status_code=%d repos_url=%s",
+                resp.status_code,
+                repos_url,
+            )
             raise NotImplementedError()  # TODO: Implement
 
         return GitHubGitTree.model_validate(resp.json())
