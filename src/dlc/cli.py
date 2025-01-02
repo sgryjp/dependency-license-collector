@@ -12,6 +12,7 @@ from typing import TextIO
 import click
 import pydantic
 import tenacity
+from click_help_colors import HelpColorsCommand
 from rich.logging import RichHandler
 from typing_extensions import assert_never
 
@@ -23,7 +24,11 @@ from .models.common import InputFormat
 _logger = logging.getLogger(__name__)
 
 
-@click.command
+@click.command(
+    cls=HelpColorsCommand,
+    help_headers_color="yellow",
+    help_options_color="blue",
+)
 @click.option(
     "-f",
     "--format",
