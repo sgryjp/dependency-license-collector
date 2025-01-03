@@ -24,9 +24,17 @@
         text-align: right;
       }
 
+      p,
+      li,
+      th,
+      td,
+      pre,
+      tt {
+        font-size: 16px;
+      }
+
       .license-table {
         border-collapse: collapse;
-        font-size: 16px;
       }
 
       .license-table th,
@@ -57,12 +65,6 @@
       <li>Number of Packages Processed: {{ packages | length }}</li>
       <li>Number of Failures: {{ num_failures }}</li>
     </ul>
-
-    <h2>Input Source</h2>
-    <details>
-      <summary>Toggle</summary>
-      <pre>{{ input_source }}</pre>
-    </details>
 
     <h2>License List</h2>
     <table class="license-table">
@@ -127,6 +129,15 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <h2>Input Source</h2>
+    <ul>
+      <li>Data Format: <tt>{{ input_format }}</tt></li>
+    </ul>
+    <details>
+      <summary>Toggle Input Source</summary>
+      <pre>{{ input_source }}</pre>
+    </details>
 
     <footer>
       <p>

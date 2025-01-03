@@ -5,7 +5,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, computed_field
 
-from dlc.models.common import Package
+from dlc.models.common import InputFormat, Package
 
 
 class Dlc(BaseModel):
@@ -16,6 +16,7 @@ class Dlc(BaseModel):
 
 class ReportParams(BaseModel):
     dlc: Dlc = Field(default_factory=Dlc)
+    input_format: InputFormat
     input_source: str
     outdir: Annotated[Path, lambda p: p.is_dir()]
     start_time: Annotated[datetime, lambda dt: dt.tzinfo is not None]

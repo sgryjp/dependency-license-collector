@@ -87,6 +87,7 @@ def main(
 
         # Save the result
         report_params = ReportParams(
+            input_format=format,
             input_source=input_content,
             outdir=outdir,
             start_time=start_time,
