@@ -25,3 +25,7 @@ class LicenseDataUnavailableError(DependencyLicenseCollectorError):
         msg = f"License data not available: {msg}"
         super().__init__(msg)
         self.status_code = status_code
+
+
+class VersionSpecifierError(DependencyLicenseCollectorError):
+    """Raised when unacceptable version specifier was found."""

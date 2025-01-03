@@ -7,8 +7,9 @@ from time import monotonic
 from typing import Optional
 
 import httpx
+from packaging.requirements import Requirement
 
-from dlc.exceptions import LicenseDataUnavailableError
+from dlc.exceptions import LicenseDataUnavailableError, VersionSpecifierError
 from dlc.models.common import Package
 from dlc.models.github import GitHubLicenseContent
 from dlc.models.pypi import PyPIPackage
@@ -24,19 +25,32 @@ def collect_package_metadata(
     executor: Executor,
     dependency_specifiers: list[str],
 ) -> list[Package]:
-    n_packages = len(dependency_specifiers)
+    requirements = [
+        Requirement(s)
+        for s in dependency_specifiers
+        if not s.startswith("-")  # Exclude pip install options
+    ]
+    n_packages = len(requirements)
     _logger.info(
-        "Start collecting license data of %d package(s) from PyPI.",
-        n_packages,
+        "Start collecting license data of %d package(s) from PyPI.", n_packages
     )
 
     # Extract package name and version number
-    name_and_version_tuples = [
-        (tup[0].strip(), tup[1].strip())
-        for specifier in dependency_specifiers
-        if "==" in specifier
-        if len(tup := specifier.split("==")) == 2
-    ]
+    name_and_version_tuples = []
+    for requirement in requirements:
+        if len(requirement.specifier) != 1:
+            msg = (
+                f"Version specifier must be in form of 'name==version': {requirement!s}"
+            )
+            raise VersionSpecifierError(msg)
+
+        specifier = list(requirement.specifier)[0]
+        if specifier.operator != "==":
+            msg = f"Version specifier's operator must be `==`: {requirement!s}"
+            raise VersionSpecifierError(msg)
+
+        name_and_version_tuples.append((requirement.name, specifier.version))
+
     _logger.debug("Target packages: %s", name_and_version_tuples)
 
     # Get package metadata from PyPI
