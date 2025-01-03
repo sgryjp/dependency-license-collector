@@ -11,3 +11,4 @@ dist/
 *.log*
 *.py[co]
 coverage.xml
+requirements*.txt

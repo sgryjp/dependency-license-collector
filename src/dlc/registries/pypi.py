@@ -84,8 +84,8 @@ def collect_package_metadata(
         Package(
             name=name,
             version=version,
-            package_data=pypi_record,
-            raw_license_data=license_content,
+            registry_data=pypi_record,
+            license_data=license_content,
         )
         for ((name, version), pypi_record), license_content in zip(
             pypi_records.items(),

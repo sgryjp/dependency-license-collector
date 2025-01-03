@@ -26,7 +26,12 @@ class GitHubLicenseContent(BaseModel):
     encoding: str
     license: GitHubLicenseSimple
 
+    _decode_content: Optional[bytes] = None
+
     def decode_content(self) -> Optional[bytes]:
+        if self._decode_content is not None:
+            return self._decode_content
+
         if self.encoding == "base64":
             return b64decode(self.content)
         _logger.warning("Unsupported encoding: %s", self.encoding)

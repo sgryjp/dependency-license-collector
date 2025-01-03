@@ -3,6 +3,7 @@
 import concurrent
 import logging
 import logging.config
+import pathlib
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -11,14 +12,16 @@ from pathlib import Path
 from typing import TextIO
 
 import click
+import jinja2
 import pydantic
 import tenacity
 from click_help_colors import HelpColorsCommand
 from rich.logging import RichHandler
 from typing_extensions import assert_never
 
-from dlc import reports
 from dlc.registries.pypi import collect_package_metadata
+from dlc.reports.html_report import write_html_report
+from dlc.reports.report_params import ReportParams
 from dlc.settings import SETTINGS
 
 from .models.common import InputFormat
@@ -68,20 +71,27 @@ def main(
 
     start_time = datetime.now(tz=timezone.utc)
     try:
+        input_content = input_file.read()
+
         # Collect package metadata and license data
         if format == "requirements_txt":
             with ThreadPoolExecutor(SETTINGS.max_workers) as executor:
-                packages = collect_package_metadata(executor, input_file.readlines())
+                packages = collect_package_metadata(
+                    executor, input_content.splitlines()
+                )
         else:
             assert_never(format)
         n_packages = len(packages)
         _logger.info("Collected license data of %d packages.", n_packages)
 
         # Save the result
-        outdir.joinpath("raw").mkdir(parents=True, exist_ok=True)
-        reports.jsonlines.generate(outdir, packages)
-        reports.license_files.generate(outdir.joinpath("raw"), packages)
-        reports.html.generate(outdir, start_time, packages)
+        report_params = ReportParams(
+            input_source=input_content,
+            outdir=outdir,
+            start_time=start_time,
+            packages=packages,
+        )
+        write_html_report(report_params)
     except Exception:
         _logger.exception("Unexpected error")
         sys.exit(1)
@@ -104,7 +114,15 @@ def _setup_logging(verbosity: int) -> None:
                 omit_repeated_times=False,
                 show_path=False,
                 rich_tracebacks=True,
-                tracebacks_suppress=[click, concurrent, logging, pydantic, tenacity],
+                tracebacks_suppress=[
+                    click,
+                    concurrent,
+                    jinja2,
+                    logging,
+                    pathlib,
+                    pydantic,
+                    tenacity,
+                ],
             ),
             file_handler,
         ],

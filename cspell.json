@@ -8,11 +8,13 @@
     "*.jsonl",
     "*.toml",
     "build/",
-    "dist/"
+    "dist/",
+    "requirements*.txt"
   ],
   "dictionaryDefinitions": [],
   "dictionaries": ["python"],
   "words": [
+    "apache-flink",
     "bugtrack_url",
     "levelname",
     "libdeeplake",
