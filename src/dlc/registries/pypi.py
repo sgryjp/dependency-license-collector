@@ -28,6 +28,7 @@ def collect_package_metadata(
     requirements = [
         Requirement(s)
         for s in dependency_specifiers
+        if not s.startswith("#")  # Exclude comments
         if not s.startswith("-")  # Exclude pip install options
     ]
     n_packages = len(requirements)
