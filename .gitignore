@@ -12,4 +12,7 @@ report/
 *.log*
 *.py[co]
 coverage.xml
+Pipfile
+Pipfile.lock
+poetry.lock
 requirements*.txt

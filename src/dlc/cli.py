@@ -45,7 +45,7 @@ _logger = logging.getLogger(__name__)
     "--outdir",
     type=click.Path(file_okay=False, writable=True, path_type=Path),
     default=Path("report"),
-    help="Target programming language.",
+    help="Directory to store generated report files.",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Log more verbose message.")
 @click.option("-q", "--quiet", is_flag=True, help="Log less verbose message.")
@@ -58,13 +58,15 @@ def main(
     quiet: bool,
     input_file: TextIO,
 ) -> None:
-    """Create list and download OSS license files.
+    """Collect OSS license data of dependency packages.
+
+    DLC (Dependency License Collector) collects dependency packages' license data,
+    download license file content, and generate an HTML report.
 
     Use a special value "-" as FILENAME to read data from standard input.
 
     For Python, a subset of "requirements.txt" is supported.
     Strictly writing, only the dependency specifier using `==` is supported.
-    Example command is: `pip freeze | dlc -l python`.
     """
     _setup_logging(outdir, int(verbose) - int(quiet))
 
