@@ -80,6 +80,8 @@ def main(
                 )
         else:
             assert_never(format)
+            msg = f"Unsupported input format: {format}"
+            raise AssertionError(msg)
         n_packages = len(packages)
         _logger.info("Collected license data of %d packages.", n_packages)
 
