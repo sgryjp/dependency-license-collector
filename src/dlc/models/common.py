@@ -1,4 +1,5 @@
 import re
+from functools import cached_property
 from typing import Literal, Optional, Union
 
 import httpx
@@ -34,7 +35,7 @@ class Package(BaseModel):
             assert_never(self.license_data._tag)
             raise AssertionError()
 
-    @property
+    @cached_property
     def license_file(self) -> Optional[bytes]:
         if self.license_data is None:
             # Try using package registry data
