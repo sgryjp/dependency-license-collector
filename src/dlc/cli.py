@@ -44,7 +44,7 @@ _logger = logging.getLogger(__name__)
     "-o",
     "--outdir",
     type=click.Path(file_okay=False, writable=True, path_type=Path),
-    default=Path(),
+    default=Path("report"),
     help="Target programming language.",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Log more verbose message.")
