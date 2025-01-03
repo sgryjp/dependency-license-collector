@@ -11,19 +11,14 @@ _p = pytest.param
 @pytest.mark.parametrize(
     ("name", "version"),
     [
-        _p("click", "8.1.8", id="normal"),
+        _p("click", "8.1.8", id="PyPI.info.project_urls['Source'] is GitHub"),
         _p(
             "libdeeplake",
             "0.0.153",
             id="PyPI.info.project_urls['Source'] is 404",
             marks=pytest.mark.xfail,
         ),
-        _p(
-            "apache-flink",
-            "1.20.0",
-            id="PyPI.info.license is URL",
-            marks=pytest.mark.xfail,
-        ),
+        _p("apache-flink", "1.20.0", id="PyPI.info.license is URL"),
     ],
 )
 def test_collect_package_metadata(
