@@ -1,9 +1,25 @@
 {
   "version": "0.2",
-  "ignorePaths": [".*cache/", ".venv/", "*.toml", "build/", "dist/"],
+  "ignorePaths": [
+    ".*cache/",
+    ".venv/",
+    "*.log",
+    "*.json",
+    "*.jsonl",
+    "*.toml",
+    "build/",
+    "dist/"
+  ],
   "dictionaryDefinitions": [],
   "dictionaries": ["python"],
-  "words": ["levelname", "libdeeplake", "Suguru", "Yamamoto"],
+  "words": [
+    "bugtrack_url",
+    "levelname",
+    "libdeeplake",
+    "NOASSERTION",
+    "Suguru",
+    "Yamamoto"
+  ],
   "ignoreWords": [],
   "language": "en",
   "import": []

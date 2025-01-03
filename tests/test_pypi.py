@@ -6,6 +6,7 @@ import pytest
 from dlc.registries.pypi import PyPIPackage, collect_package_metadata
 
 _logger = logging.getLogger(__name__)
+_p = pytest.param
 
 
 def test_can_get_pypi_top100(executor: Executor, pypi_top100: list[PyPIPackage]):
@@ -29,13 +30,42 @@ def test_can_get_pypi_top100(executor: Executor, pypi_top100: list[PyPIPackage])
 @pytest.mark.parametrize(
     ("name", "version"),
     [
-        ("libdeeplake", "0.0.153"),  # "Source" URL returns 404
+        _p("click", "8.1.8", id="normal"),
+        _p(
+            "libdeeplake",
+            "0.0.153",
+            id="PyPI.info.project_urls['Source'] is 404",
+            marks=pytest.mark.xfail,
+        ),
+        _p(
+            "apache-flink",
+            "1.20.0",
+            id="PyPI.info.license is URL",
+            marks=pytest.mark.xfail,
+        ),
     ],
 )
-def test_pypi_past_cases(executor: Executor, name: str, version: str):
-    dependency_specifier = f"{name}=={version}"
-    packages = collect_package_metadata(executor, [dependency_specifier])
-    assert len(packages) == 1
-    package = packages[0]
+def test_collect_package_metadata(
+    executor: Executor, package_info_logger: logging.Logger, name: str, version: str
+) -> None:
+    package = None
+    try:
+        dependency_specifier = f"{name}=={version}"
+        packages = collect_package_metadata(executor, [dependency_specifier])
+        assert len(packages) == 1
+        package = packages[0]
 
-    assert package.license_file is not None, f"{package.name} {package.version}"
+        license_file = package.license_file
+        assert license_file is not None, f"{package.name} {package.version}"
+    except AssertionError:
+        package_info_logger.info("********** %s %s", name, version)
+        package_info_logger.info(
+            'To test this package: echo "%s==%s" | uv run dlc -f requirements_txt -o report -',
+            name,
+            version,
+        )
+        if package is not None:
+            package_info_logger.info(
+                "Package Data:\n```json\n%s\n```", package.model_dump_json(indent=2)
+            )
+        raise

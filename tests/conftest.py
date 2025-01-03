@@ -19,6 +19,21 @@ _cache_expiry = 24 * 3600  # 1 day
 
 
 @pytest.fixture
+def package_info_logger() -> logging.Logger:
+    formatter = logging.Formatter("%(asctime)s %(message)s")
+
+    handler = logging.FileHandler("test_package_info.log", encoding="utf-8")
+    handler.formatter = formatter
+
+    logger = logging.getLogger("tests.package_info")
+    logger.propagate = False
+    logger.setLevel("DEBUG")
+    logger.handlers = [handler]
+
+    return logger
+
+
+@pytest.fixture
 def executor() -> Iterator[Executor]:
     with ThreadPoolExecutor(SETTINGS.max_workers) as executor:
         yield executor
