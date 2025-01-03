@@ -19,12 +19,11 @@ from click_help_colors import HelpColorsCommand
 from rich.logging import RichHandler
 from typing_extensions import assert_never
 
+from dlc.models.common import InputFormat
 from dlc.registries.pypi import collect_package_metadata
 from dlc.reports.html_report import write_html_report
 from dlc.reports.report_params import ReportParams
 from dlc.settings import SETTINGS
-
-from .models.common import InputFormat
 
 _logger = logging.getLogger(__name__)
 
@@ -67,7 +66,7 @@ def main(
     Strictly writing, only the dependency specifier using `==` is supported.
     Example command is: `pip freeze | dlc -l python`.
     """
-    _setup_logging(int(verbose) - int(quiet))
+    _setup_logging(outdir, int(verbose) - int(quiet))
 
     start_time = datetime.now(tz=timezone.utc)
     try:
@@ -97,14 +96,16 @@ def main(
         sys.exit(1)
 
 
-def _setup_logging(verbosity: int) -> None:
+def _setup_logging(outdir: Path, verbosity: int) -> None:
+    outdir.mkdir(parents=True, exist_ok=True)
+
     level = {-1: logging.WARNING, 1: logging.DEBUG}.get(verbosity, logging.INFO)
     file_formatter = logging.Formatter(
         "%(asctime)s %(levelname)-7s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
     file_formatter.default_msec_format = "%s.%03d"
     file_handler = RotatingFileHandler(
-        filename="dlc.log", maxBytes=1024 * 1024, backupCount=1
+        filename=outdir.joinpath("dlc.log"), maxBytes=1024 * 1024, backupCount=1
     )
     file_handler.setFormatter(file_formatter)
     logging.basicConfig(
