@@ -2,6 +2,9 @@
 
 # Dependency License Collector
 
+[![Test](https://github.com/sgryjp/dependency-license-collector/actions/workflows/ci.yaml/badge.svg)](https://github.com/sgryjp/dependency-license-collector/actions/workflows/ci.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/sgryjp/dependency-license-collector/badge.svg?branch=ci/use-coveralls)](https://coveralls.io/github/sgryjp/dependency-license-collector?branch=ci/use-coveralls)
+
 > A tool for collecting dependency licenses in software projects.
 
 ## Supported Inputs
