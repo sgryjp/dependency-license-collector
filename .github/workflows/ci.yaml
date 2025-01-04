@@ -1,12 +1,12 @@
 name: Test
 
 on:
-  # Run at 00:00 on Monday or manual trigger
-  schedule:
-    - cron: "0 0 * * 1"
-  workflow_dispatch: # Allows manual triggering
-  pull_request:
   push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: "0 0 * * 1" # Run at 00:00 on Monday
 
 jobs:
   test:
