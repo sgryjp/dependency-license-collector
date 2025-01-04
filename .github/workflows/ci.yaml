@@ -1,12 +1,12 @@
 name: Test
 
 on:
-  # Run at 00:00 on Monday or manual trigger
-  schedule:
-    - cron: "0 0 * * 1"
-  workflow_dispatch: # Allows manual triggering
-  pull_request:
   push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: "0 0 * * 1" # Run at 00:00 on Monday
 
 jobs:
   test:
@@ -32,4 +32,21 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Run tests
-        run: uv run -- pytest -vv --cov=dlc --cov-report=xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run -- pytest -vv --cov-report=xml
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel: true
+          flag-name: python-${{ matrix.python-version }}
+
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finalize Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
