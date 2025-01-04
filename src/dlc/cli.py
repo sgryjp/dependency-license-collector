@@ -58,7 +58,7 @@ def main(
     quiet: bool,
     input_file: TextIO,
 ) -> None:
-    """Collect OSS license data of dependency packages.
+    """A tool for collecting dependency licenses in software projects.
 
     DLC (Dependency License Collector) collects dependency packages' license data,
     download license file content, and generate an HTML report.
