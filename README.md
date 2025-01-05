@@ -36,7 +36,9 @@ Usage: dlc [OPTIONS] FILENAME
   Use a special value "-" as FILENAME to read data from standard input.
 
   For Python, a subset of "requirements.txt" is supported. Strictly writing,
-  only the dependency specifier using `==` is supported.
+  only the dependency specifier using `==` is supported. Note that majority of
+  project management tools such as Pipenv, Poetry, and uv supports exporting
+  list of dependencies in this format.
 
 Options:
   -f, --format [requirements_txt]

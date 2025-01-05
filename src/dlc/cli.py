@@ -73,6 +73,8 @@ def main(  # noqa: PLR0913
 
     For Python, a subset of "requirements.txt" is supported.
     Strictly writing, only the dependency specifier using `==` is supported.
+    Note that majority of project management tools such as Pipenv, Poetry, and
+    uv supports exporting list of dependencies in this format.
     """
     _setup_logging(outdir, int(verbose) - int(quiet))
 
