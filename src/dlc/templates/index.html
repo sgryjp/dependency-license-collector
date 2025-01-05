@@ -69,6 +69,8 @@
 
     <h2>Summary</h2>
     <dl class="property-list">
+      <dt>Language</dt>
+      <dd>{{ language }}</dd>
       <dt>Executed at</dt>
       <dd>{{ start_time }}</dd>
       <dt>Number of Packages Processed</dt>
@@ -142,13 +144,7 @@
     </table>
 
     <h2>Input Source</h2>
-    <ul>
-      <li>Data Format: <tt>{{ input_format }}</tt></li>
-    </ul>
-    <details>
-      <summary>Toggle Input Source</summary>
-      <pre>{{ input_source }}</pre>
-    </details>
+    <pre>{{ input_source }}</pre>
 
     <footer>
       <p>

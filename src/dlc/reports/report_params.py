@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Annotated
 
 from pydantic import BaseModel, Field, computed_field
+from typing_extensions import assert_never
 
 from dlc.models.common import InputFormat, Package
 
@@ -26,3 +27,13 @@ class ReportParams(BaseModel):
     @property
     def num_failures(self) -> int:
         return sum(package.license_file is None for package in self.packages)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def language(self) -> str:
+        if self.input_format == "requirements_txt":
+            return "Python"
+        else:
+            assert_never(self.input_format)
+            msg = f"Unsupported input format: {self.input_format}"
+            raise AssertionError(msg)
