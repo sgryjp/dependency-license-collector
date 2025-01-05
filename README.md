@@ -41,6 +41,8 @@ Usage: dlc [OPTIONS] FILENAME
 Options:
   -f, --format [requirements_txt]
                                   Input data format.  [required]
+  --target-name NAME              Name of the target software project. This
+                                  will be used in the report.
   -o, --outdir DIRECTORY          Directory to store generated report files.
   -v, --verbose                   Log more verbose message.
   -q, --quiet                     Log less verbose message.
