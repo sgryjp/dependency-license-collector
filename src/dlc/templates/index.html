@@ -7,7 +7,9 @@
       name="generator"
       content="Dependency License Collector v{{ dlc.version }}"
     />
-    <title>List of Dependency License Files</title>
+    <title>
+      Dependency Licenses{% if target_name %} of {{ target_name }}{% endif %}
+    </title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -65,7 +67,9 @@
     </style>
   </head>
   <body>
-    <h1>List of Dependency License Files</h1>
+    <h1>
+      Dependency Licenses{% if target_name %} of {{ target_name }}{% endif %}
+    </h1>
 
     <h2>Summary</h2>
     <dl class="property-list">

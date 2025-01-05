@@ -1,7 +1,7 @@
 import importlib.metadata
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, computed_field
 from typing_extensions import assert_never
@@ -19,6 +19,7 @@ class ReportParams(BaseModel):
     dlc: Dlc = Field(default_factory=Dlc)
     input_format: InputFormat
     input_source: str
+    target_name: Optional[str]
     outdir: Annotated[Path, lambda p: p.is_dir()]
     start_time: Annotated[datetime, lambda dt: dt.tzinfo is not None]
     packages: list[Package]

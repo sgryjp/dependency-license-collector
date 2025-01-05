@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import TextIO
+from typing import Optional, TextIO
 
 import click
 import jinja2
@@ -41,6 +41,11 @@ _logger = logging.getLogger(__name__)
     help="Input data format.",
 )
 @click.option(
+    "--target-name",
+    metavar="NAME",
+    help="Name of the target software project. This will be used in the report.",
+)
+@click.option(
     "-o",
     "--outdir",
     type=click.Path(file_okay=False, writable=True, path_type=Path),
@@ -50,9 +55,10 @@ _logger = logging.getLogger(__name__)
 @click.option("-v", "--verbose", is_flag=True, help="Log more verbose message.")
 @click.option("-q", "--quiet", is_flag=True, help="Log less verbose message.")
 @click.argument("input_file", metavar="FILENAME", type=click.File("rt"))
-def main(
+def main(  # noqa: PLR0913
     *,
     format: InputFormat,  # noqa: A002
+    target_name: Optional[str],
     outdir: Path,
     verbose: bool,
     quiet: bool,
@@ -91,6 +97,7 @@ def main(
         report_params = ReportParams(
             input_format=format,
             input_source=input_content,
+            target_name=target_name,
             outdir=outdir,
             start_time=start_time,
             packages=packages,
