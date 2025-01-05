@@ -24,13 +24,21 @@
         text-align: right;
       }
 
-      p,
-      li,
-      th,
-      td,
-      pre,
-      tt {
-        font-size: 16px;
+      .property-list {
+        display: grid;
+        grid-template-columns: max-content max-content;
+      }
+
+      .property-list dt {
+        font-weight: bold;
+      }
+
+      .property-list dt::after {
+        content: ":";
+      }
+
+      .property-list dd {
+        margin-left: 1rem;
       }
 
       .license-table {
@@ -60,11 +68,14 @@
     <h1>List of Dependency License Files</h1>
 
     <h2>Summary</h2>
-    <ul>
-      <li>Executed at: {{ start_time }}</li>
-      <li>Number of Packages Processed: {{ packages | length }}</li>
-      <li>Number of Failures: {{ num_failures }}</li>
-    </ul>
+    <dl class="property-list">
+      <dt>Executed at</dt>
+      <dd>{{ start_time }}</dd>
+      <dt>Number of Packages Processed</dt>
+      <dd>{{ packages | length }}</dd>
+      <dt>Number of Failures</dt>
+      <dd>{{ num_failures }}</dd>
+    </dl>
 
     <h2>License List</h2>
     <table class="license-table">
