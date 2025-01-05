@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate report
         run: |
-          uv export --no-hashes | uv run dlc -f requirements_txt -
+          uv export --no-hashes | uv run dlc -f requirements_txt --target-name "Dependency License Collector" -
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
