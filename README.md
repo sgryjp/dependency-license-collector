@@ -53,9 +53,11 @@ Options:
 
 ## Configurations (Environment Variables)
 
+These environment variables are supported:
+
 - `GITHUB_TOKEN`
-  - GitHub Personal Token for API access.
-- `MAX_WORKERS`
+  - GitHub personal token for API access.
+- `DLC_MAX_WORKERS`
   - Number of worker threads to use.
     If omitted it will be the number of CPUs.
 

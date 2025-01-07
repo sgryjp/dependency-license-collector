@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Option to show name of the target software in the report
   ([#5](https://github.com/sgryjp/dependency-license-collector/issues/5))
+- Support additionally reading environment variables with prefix `DLC_`
+  ([#9](https://github.com/sgryjp/dependency-license-collector/issues/9))
 
 ### Fixed
 
