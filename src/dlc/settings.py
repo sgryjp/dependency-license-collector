@@ -12,7 +12,9 @@ class Settings(BaseSettings):
     github_token: Optional[str] = None
     max_workers: Optional[int] = os.cpu_count() or 1
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_prefix="DLC_", extra="ignore"
+    )
 
 
 SETTINGS = Settings()
