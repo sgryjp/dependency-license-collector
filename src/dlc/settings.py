@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     github_token: Optional[str] = None
     max_workers: Optional[int] = None
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 SETTINGS = Settings()
