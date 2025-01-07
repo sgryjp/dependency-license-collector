@@ -57,6 +57,7 @@ Options:
   - GitHub Personal Token for API access.
 - `MAX_WORKERS`
   - Number of worker threads to use.
+    If omitted it will be the number of CPUs.
 
 > [!TIP]
 > This command can read environment variables from `.env` file at the current directory.
