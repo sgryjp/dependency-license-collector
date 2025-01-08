@@ -11,11 +11,11 @@ requires-python = ">=3.9"
 dependencies = [
     "click>=8.1.8",
     "click-help-colors>=0.9.4",
-    "httpx>=0.28.1",
     "jinja2>=3.1.5",
     "packaging>=24.2",
     "pydantic>=2.10.4",
     "pydantic-settings>=2.7.0",
+    "requests>=2.32.3",
     "rich>=13.9.4",
     "tenacity>=9.0.0",
     "typing-extensions>=4.12.2",
@@ -25,7 +25,13 @@ dependencies = [
 dlc = "dlc.cli:main"
 
 [dependency-groups]
-dev = ["mypy>=1.14.0", "pytest>=8.3.4", "pytest-cov>=6.0.0", "ruff>=0.8.4"]
+dev = [
+    "mypy>=1.14.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.8.4",
+    "types-requests>=2.32.0.20241016",
+]
 
 [tool.mypy]
 sqlite_cache = true
@@ -66,7 +72,7 @@ known-first-party = ["dlc"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-ra --cov=dlc --cov-report=term-missing --log-format='%(levelname)-8s %(name)-32s %(message)s' --log-level=INFO --log-disable=httpx --log-file=test.log --tb=short"
+addopts = "-ra --cov=dlc --cov-report=term-missing --log-format='%(levelname)-8s %(name)-32s %(message)s' --log-level=INFO --log-disable=requests --log-file=test.log --tb=short"
 
 [tool.setuptools]
 include-package-data = true
