@@ -3,7 +3,7 @@ import re
 from collections.abc import Sequence
 from typing import Optional, Union
 
-import httpx
+import requests
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -37,7 +37,7 @@ def get_license_data_from_github(
     url = f"https://api.github.com/repos/{owner}/{repo}/license"
     headers = _make_headers_for_github_api() | {"accept": "application/vnd.github+json"}
     _logger.debug("Fetching %s", url)
-    resp = httpx.get(url, headers=headers)
+    resp = requests.get(url, headers=headers, timeout=SETTINGS.timeout)
     if resp.status_code == 403:
         _logger.warning("Hit rate limit of GitHub API. repos_url=%s", repos_url)
         raise ApiRateLimitError()
@@ -66,7 +66,9 @@ def get_file_list_from_github(
             "accept": "application/vnd.github+json",
         }
         _logger.debug("Fetching %s", url)
-        resp = httpx.get(url, params={"recursive": "true"}, headers=headers)
+        resp = requests.get(
+            url, params={"recursive": "true"}, headers=headers, timeout=SETTINGS.timeout
+        )
         if resp.status_code == 404:
             continue
         elif resp.status_code == 403:

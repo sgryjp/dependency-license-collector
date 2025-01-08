@@ -2,13 +2,14 @@ import re
 from functools import cached_property
 from typing import Literal, Optional, Union
 
-import httpx
+import requests
 from pydantic import BaseModel, computed_field
 from typing_extensions import TypeAlias, assert_never
 
 from dlc.models.github import GitHubLicenseContent
 from dlc.models.pypi import PyPIPackage
 from dlc.models.version import Version
+from dlc.settings import SETTINGS
 
 InputFormat: TypeAlias = Literal["requirements_txt"]
 _re_http_url = re.compile(r"^https?://")
@@ -45,8 +46,10 @@ class Package(BaseModel):
                 and self.registry_data.info.license is not None
                 and _re_http_url.match(self.registry_data.info.license)
             ):
-                resp = httpx.get(
-                    self.registry_data.info.license, headers={"Accept": "text/plain"}
+                resp = requests.get(
+                    self.registry_data.info.license,
+                    headers={"Accept": "text/plain"},
+                    timeout=SETTINGS.timeout,
                 )
                 return resp.content
 

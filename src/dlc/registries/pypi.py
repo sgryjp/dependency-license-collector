@@ -6,7 +6,7 @@ from pathlib import Path
 from time import monotonic
 from typing import Optional
 
-import httpx
+import requests
 from packaging.requirements import Requirement
 
 from dlc.exceptions import LicenseDataUnavailableError, VersionSpecifierError
@@ -17,6 +17,7 @@ from dlc.repositories.github import (
     get_file_list_from_github,
     get_license_data_from_github,
 )
+from dlc.settings import SETTINGS
 
 _logger = logging.getLogger(__name__)
 
@@ -124,10 +125,12 @@ def _guess_repository_url(package_data: PyPIPackage) -> Optional[str]:
     return None
 
 
-def _get_pypi_package_data(name: str, version: str) -> tuple[str, str, httpx.Response]:
+def _get_pypi_package_data(
+    name: str, version: str
+) -> tuple[str, str, requests.Response]:
     url = f"https://pypi.org/pypi/{name}/{version}/json"
     _logger.debug("GET %s", url)
-    return name, version, httpx.get(url)
+    return name, version, requests.get(url, timeout=SETTINGS.timeout)
 
 
 def _get_license_info(

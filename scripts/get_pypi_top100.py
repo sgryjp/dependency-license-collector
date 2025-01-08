@@ -8,10 +8,11 @@ from concurrent.futures import Executor, ThreadPoolExecutor
 from pathlib import Path
 
 import click
-import httpx
+import requests
 import rich.logging
 
 from dlc.models.pypi import PyPIPackage, PyPIStats
+from dlc.settings import SETTINGS
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +36,9 @@ def _collect(executor: Executor) -> list[PyPIPackage]:
     # https://docs.pypi.org/api/stats/#project-stats
     headers = {}
     headers["Accept"] = "application/json"
-    response = httpx.get("https://pypi.org/stats/", headers=headers)
+    response = requests.get(
+        "https://pypi.org/stats/", headers=headers, timeout=SETTINGS.timeout
+    )
     if response.status_code != 200:
         msg = f"Failed to get PyPI statistics data. status_code={response.status_code}"
         _logger.error(msg)
@@ -46,7 +49,11 @@ def _collect(executor: Executor) -> list[PyPIPackage]:
     headers = {}
     headers["Accept"] = "application/json"
     urls = [f"https://pypi.org/pypi/{name}/json" for name in stats.top_packages]
-    responses = list(executor.map(lambda x: httpx.get(x, headers=headers), urls))
+    responses = list(
+        executor.map(
+            lambda x: requests.get(x, headers=headers, timeout=SETTINGS.timeout), urls
+        )
+    )
     package_data: list[PyPIPackage] = []
     for package_name, response in zip(stats.top_packages, responses):
         if response.status_code != 200:

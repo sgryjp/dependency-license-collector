@@ -59,7 +59,10 @@ These environment variables are supported:
   - GitHub personal token for API access.
 - `DLC_MAX_WORKERS` or `MAX_WORKERS`
   - Number of worker threads to use.
-    If omitted it will be the number of CPUs.
+    (default: Same as the number of CPUs)
+- `DLC_TIMEOUT` or `TIMEOUT`
+  - Timeout for HTTP requests in fraction of seconds.
+    (default: 10.0)
 
 > [!TIP]
 > This command can read environment variables from `.env` file at the current directory.
