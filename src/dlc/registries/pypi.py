@@ -17,6 +17,7 @@ from dlc.repositories.github import (
     get_file_list_from_github,
     get_license_data_from_github,
 )
+from dlc.settings import SETTINGS
 
 _logger = logging.getLogger(__name__)
 
@@ -129,7 +130,7 @@ def _get_pypi_package_data(
 ) -> tuple[str, str, requests.Response]:
     url = f"https://pypi.org/pypi/{name}/{version}/json"
     _logger.debug("GET %s", url)
-    return name, version, requests.get(url)
+    return name, version, requests.get(url, timeout=SETTINGS.timeout)
 
 
 def _get_license_info(
