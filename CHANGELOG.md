@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fail if launched in a different app source tree which uses .env
   ([#7](https://github.com/sgryjp/dependency-license-collector/issues/7))
 
-## v0.1.0
+## [0.1.0] - 2025-01-05
 
 _First release_
+
+[0.1.0]: https://github.com/sgryjp/dependency-license-collector/releases/tag/v0.1.0
