@@ -1,32 +1,37 @@
 ---
 name: Bug report
 about: Create a report to help DLC improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Symptom
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+(A clear and concise description of what the bug is.)
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Steps to Reproduce
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+(Steps to reproduce the behavior. An ordered list is preferred.)
 
-**Environment**
- - OS: [e.g. Ubuntu 24.04]
- - Python Version: [e.g. 3.9]
- - DLC Version: [e.g. 22]
+1. Step 1
+2. Step 2
+3. ...
 
-**Additional context**
-Add any other context about the problem here.
+## Expected Behavior
+
+(A clear and concise description of what you expected to happen.)
+
+## Environment
+
+- DLC Version: (e.g.: 22)
+- Python Version: (e.g.: 3.9)
+- OS: (e.g.: Windows, macOS, Ubuntu 24.04)
+
+## Logs or Screenshots
+
+(If applicable, copy & paste command log or screenshots to help explain your problem.)
+
+## Additional Context
+
+(Add any other context about the problem here.)
