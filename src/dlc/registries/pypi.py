@@ -4,13 +4,17 @@ import logging
 from concurrent.futures import Executor
 from pathlib import Path
 from time import monotonic
-from typing import Optional
+from typing import Optional, Union
 
 import requests
 from packaging.requirements import Requirement
 
-from dlc.exceptions import LicenseDataUnavailableError, VersionSpecifierError
-from dlc.models.common import Package
+from dlc.exceptions import (
+    ApiRateLimitError,
+    LicenseDataUnavailableError,
+    VersionSpecifierError,
+)
+from dlc.models.common import LicenseContentFailed, Package
 from dlc.models.github import GitHubLicenseContent
 from dlc.models.pypi import PyPIPackage
 from dlc.repositories.github import (
@@ -135,7 +139,7 @@ def _get_pypi_package_data(
 
 def _get_license_info(
     name: str, version: str, repos_url: Optional[str]
-) -> Optional[GitHubLicenseContent]:
+) -> Optional[Union[GitHubLicenseContent, LicenseContentFailed]]:
     if repos_url is None:
         return None
 
@@ -143,8 +147,16 @@ def _get_license_info(
     try:
         if (license_content := get_license_data_from_github(repos_url)) is not None:
             return license_content
+    except ApiRateLimitError:
+        _logger.error(
+            "Hit GitHub API rate limit on fetching license data. package=%s version=%s",
+            name,
+            version,
+        )
+        return LicenseContentFailed()
     except LicenseDataUnavailableError:
-        _logger.warning("License data not found. package=%s version=%s", name, version)
+        # Unusual license filename or actually no license information provided.
+        _logger.debug("License data not found. package=%s version=%s", name, version)
         try:
             # Try searching for a license file in its source tree
             tree_data = get_file_list_from_github(repos_url)

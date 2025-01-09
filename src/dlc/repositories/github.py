@@ -5,6 +5,7 @@ from typing import Optional, Union
 
 import requests
 from tenacity import (
+    before_sleep_log,
     retry,
     retry_if_exception_type,
     stop_after_attempt,
@@ -22,10 +23,12 @@ _logger = logging.getLogger(__name__)
 _re_github_url = re.compile(r"https?://github.com/([^/]+)/([^/]+)")
 
 
-@retry(
+@retry(  # Retries on API rate limit error with sleep duration: 4, 8, 16, 32, 64
     retry=retry_if_exception_type(ApiRateLimitError),
-    wait=wait_exponential_jitter(4, max=64),
-    stop=stop_after_attempt(3),
+    wait=wait_exponential_jitter(initial=4),
+    stop=stop_after_attempt(6),
+    before_sleep=before_sleep_log(_logger, logging.WARNING),
+    reraise=True,
 )
 def get_license_data_from_github(
     repos_url: str,
