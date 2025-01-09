@@ -118,7 +118,14 @@ def _guess_repository_url(package_data: PyPIPackage) -> Optional[str]:
     if package_data.info.project_urls is None:
         return None
 
-    for key in ("github", "repository", "source", "homepage", "download"):
+    for key in (
+        "github",
+        "repository",
+        "source",
+        "issue tracker",
+        "homepage",
+        "download",
+    ):
         for k, v in package_data.info.project_urls.items():
             if (
                 k.lower().startswith(key)
