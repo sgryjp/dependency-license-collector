@@ -15,11 +15,15 @@ InputFormat: TypeAlias = Literal["requirements_txt"]
 _re_http_url = re.compile(r"^https?://")
 
 
+class LicenseContentFailed(BaseModel):
+    _tag: Literal["failure"] = "failure"
+
+
 class Package(BaseModel):
     name: str
     version: Version
     registry_data: Union[PyPIPackage, None]
-    license_data: Union[GitHubLicenseContent, None]
+    license_data: Union[GitHubLicenseContent, LicenseContentFailed, None]
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -32,6 +36,8 @@ class Package(BaseModel):
             if name is None or name == "NOASSERTION":
                 name = self.license_data.license.name
             return name
+        elif self.license_data._tag == "failure":
+            return "(Failed to get)"
         else:
             assert_never(self.license_data._tag)
             raise AssertionError()
@@ -39,7 +45,7 @@ class Package(BaseModel):
     @cached_property
     def license_file(self) -> Optional[bytes]:
         if self.license_data is None:
-            # Try using package registry data
+            # Fetch from URl in "license" field in PyPI package record.
             if (
                 self.registry_data is not None
                 and self.registry_data._tag == "pypi"
@@ -57,6 +63,9 @@ class Package(BaseModel):
 
         elif self.license_data._tag == "github":
             return self.license_data.decode_content()
+
+        elif self.license_data._tag == "failure":
+            return None
 
         else:
             assert_never(self.license_data._tag)

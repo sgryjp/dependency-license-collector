@@ -78,6 +78,14 @@ def main(  # noqa: PLR0913
     """
     _setup_logging(outdir, int(verbose) - int(quiet))
 
+    # Setting validation
+    if SETTINGS.github_token is None:
+        _logger.warning(
+            "(DLC_)GITHUB_TOKEN is not set; "
+            "setting MAX_WORKERS=1 to prevent API rate limit error."
+        )
+        SETTINGS.max_workers = 1
+
     start_time = datetime.now(tz=timezone.utc)
     try:
         input_content = input_file.read()
