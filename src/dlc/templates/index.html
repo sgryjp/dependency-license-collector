@@ -17,6 +17,19 @@
       rel="stylesheet"
     />
     <style type="text/css">
+      :root {
+        --warning-color: orange;
+        --error-color: red;
+      }
+
+      .failure {
+        color: var(--warning-color);
+      }
+
+      .na {
+        color: var(--error-color);
+      }
+
       footer {
         margin-top: 1rem;
         border-top: 1px solid gray;
@@ -104,7 +117,13 @@
           <td class="right aligned">{{ loop.index }}</td>
           <td><tt>{{ package.name }}</tt></td>
           <td>{{ package.version }}</td>
-          <td>{{ package.license_name or "N/A" }}</td>
+          <td>
+            {% if package.license_name is none %}
+            <span class="na">{{ '(N/A)' }}</span>
+            {% elif package.license_name[0] == "(" %}
+            <span class="failure">{{ package.license_name }}</span>
+            {% else %} {{ package.license_name }} {% endif %}
+          </td>
           <td>
             {% if not package.license_file is none %}
             <tt
@@ -112,7 +131,9 @@
                 >{{ package.name }}.txt</a
               ></tt
             >
-            {% else %} N/A {% endif %}
+            {% else %}
+            <span class="error">N/A</span>
+            {% endif %}
           </td>
           <td>
             {% if package.registry_data.info.home_page %}

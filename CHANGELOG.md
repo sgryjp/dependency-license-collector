@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([#5](https://github.com/sgryjp/dependency-license-collector/issues/5))
 - Support additionally reading environment variables with prefix `DLC_`
   ([#9](https://github.com/sgryjp/dependency-license-collector/issues/9))
+- Highlight if failed to get license data or there was no license data available.
 
 ### Fixed
 
