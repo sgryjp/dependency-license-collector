@@ -4,7 +4,7 @@ import logging
 from concurrent.futures import Executor
 from pathlib import Path
 from time import monotonic
-from typing import Optional, Union
+from typing import Optional, TextIO, Union
 
 import requests
 from packaging.requirements import Requirement
@@ -28,14 +28,9 @@ _logger = logging.getLogger(__name__)
 
 def collect_package_metadata(
     executor: Executor,
-    dependency_specifiers: list[str],
+    input_file: TextIO,
 ) -> list[Package]:
-    requirements = [
-        Requirement(s)
-        for s in dependency_specifiers
-        if not s.startswith("#")  # Exclude comments
-        if not s.startswith("-")  # Exclude pip install options
-    ]
+    requirements = _read_requirements_txt(input_file)
     n_packages = len(requirements)
     _logger.info(
         "Start collecting license data of %d package(s) from PyPI.", n_packages
@@ -112,6 +107,20 @@ def collect_package_metadata(
             license_contents,
         )
     ]
+
+
+def _read_requirements_txt(f: TextIO) -> list[Requirement]:
+    requirements = []
+    for specifier in f:
+        # Skip comments and pip options
+        if specifier.startswith("#"):
+            continue
+        if specifier.startswith("-"):
+            _logger.warning("Ignored pip option: %s", specifier)
+            continue
+
+        requirements.append(Requirement(specifier))
+    return requirements
 
 
 def _guess_repository_url(package_data: PyPIPackage) -> Optional[str]:

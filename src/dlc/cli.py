@@ -1,6 +1,7 @@
 """Command line interface."""
 
 import concurrent
+import io
 import logging
 import logging.config
 import pathlib
@@ -54,7 +55,9 @@ _logger = logging.getLogger(__name__)
 )
 @click.option("-v", "--verbose", is_flag=True, help="Log more verbose message.")
 @click.option("-q", "--quiet", is_flag=True, help="Log less verbose message.")
-@click.argument("input_file", metavar="FILENAME", type=click.File("rt"))
+@click.argument(
+    "input_file", metavar="FILENAME", type=click.File("rt", encoding="utf-8")
+)
 def main(  # noqa: PLR0913
     *,
     format: InputFormat,  # noqa: A002
@@ -92,10 +95,11 @@ def main(  # noqa: PLR0913
 
         # Collect package metadata and license data
         if format == "requirements_txt":
-            with ThreadPoolExecutor(SETTINGS.max_workers) as executor:
-                packages = collect_package_metadata(
-                    executor, input_content.splitlines()
-                )
+            with (
+                ThreadPoolExecutor(SETTINGS.max_workers) as executor,
+                io.StringIO(input_content) as f,
+            ):
+                packages = collect_package_metadata(executor, f)
         else:
             assert_never(format)
             msg = f"Unsupported input format: {format}"

@@ -1,14 +1,43 @@
+import io
 import logging
 from concurrent.futures import Executor
+from textwrap import dedent
 from typing import Optional
 from warnings import warn
 
 import pytest
 
-from dlc.registries.pypi import collect_package_metadata
+from dlc.registries.pypi import _read_requirements_txt, collect_package_metadata
 from dlc.settings import SETTINGS
 
 _p = pytest.param
+
+
+@pytest.mark.parametrize(
+    ("requirements_txt", "expected"),
+    [
+        _p("# foo==1.0.0\nbar==2.0.0", ["bar==2.0.0"], id="comment"),
+        _p("-e .\nfoo==1.0.0", ["foo==1.0.0"], id="-e"),
+        _p("-r requirements.txt\nfoo==1.0.0", ["foo==1.0.0"], id="-r"),
+        _p(
+            dedent(
+                """\
+                typing-extensions==4.12.2 \\
+                --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \\
+                --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
+                """
+            ),
+            ["typing-extensions==4.12.2"],
+            marks=pytest.mark.xfail,
+            id="--hash",
+        ),
+    ],
+)
+def test_extract_requirements(requirements_txt: str, expected: str):
+    with io.StringIO(requirements_txt) as f:
+        requirements = _read_requirements_txt(f)
+    actual = [str(r) for r in requirements]
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
